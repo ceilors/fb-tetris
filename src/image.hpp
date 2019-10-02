@@ -4,8 +4,9 @@
 #include <cstdio>
 #include <cstdint>
 #include <stdexcept>
-#include <png.h>
 #include "structs.hpp"
+
+#include <png.h>
 
 class Image {
 public:

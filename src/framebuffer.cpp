@@ -3,18 +3,18 @@
 FrameBuffer::FrameBuffer(const char *device) {
     fbfd = open(device, O_RDWR);
     if (fbfd == -1) {
-        std::runtime_error("cannot open framebuffer device");
+        throw std::runtime_error("cannot open framebuffer device");
     }
     if (ioctl(fbfd, FBIOGET_FSCREENINFO, &finfo) == -1) {
-        std::runtime_error("error reading fixed information");
+        throw std::runtime_error("error reading fixed information");
     }
     if (ioctl(fbfd, FBIOGET_VSCREENINFO, &vinfo) == -1) {
-        std::runtime_error("error reading variable information");
+        throw std::runtime_error("error reading variable information");
     }
     screen_size = vinfo.xres * vinfo.yres * vinfo.bits_per_pixel / 8;
     screen_buffer = (char *)mmap(0, screen_size, PROT_READ | PROT_WRITE, MAP_SHARED, fbfd, 0);
     if (*(int *)screen_buffer == -1) {
-        std::runtime_error("failed to map framebuffer device to memory");
+        throw std::runtime_error("failed to map framebuffer device to memory");
     }
     draw_buffer = new char [screen_size];
 }

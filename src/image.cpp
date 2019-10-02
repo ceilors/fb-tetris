@@ -6,35 +6,35 @@ Image::Image(const char *image) {
     FILE *f;
 
     if (!(f = fopen(image, "r"))) {
-        std::runtime_error("fopen problem");
+        throw std::runtime_error("fopen problem");
     }
     fread(header, 1, 8, f);
     int is_png = !png_sig_cmp(header, 0, 8);
     if (!is_png) {
         fclose(f);
-        std::runtime_error("is not png");
+        throw std::runtime_error("is not png");
     }
     png_structp png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
     if (!png_ptr) {
         fclose(f);
-        std::runtime_error("png_create_read_struct problem");
+        throw std::runtime_error("png_create_read_struct problem");
     }
     png_infop info_ptr = png_create_info_struct(png_ptr);
     if (!info_ptr) {
         png_destroy_read_struct(&png_ptr, (png_infopp)NULL, (png_infopp)NULL);
         fclose(f);
-        std::runtime_error("png_create_info_struct problem");
+        throw std::runtime_error("png_create_info_struct problem");
     }
     png_infop end_info = png_create_info_struct(png_ptr);
     if (!end_info) {
         png_destroy_read_struct(&png_ptr, (png_infopp)NULL, (png_infopp)NULL);
         fclose(f);
-        std::runtime_error("png_create_info_struct problem");
+        throw std::runtime_error("png_create_info_struct problem");
     }
     if (setjmp(png_jmpbuf(png_ptr))) {
         png_destroy_read_struct(&png_ptr, &info_ptr, &end_info);
         fclose(f);
-        std::runtime_error("setjmp problem");
+        throw std::runtime_error("setjmp problem");
     }
 
     png_init_io(png_ptr, f);
@@ -77,14 +77,14 @@ Image::Image(const char *image) {
     if (!raw) {
         png_destroy_read_struct(&png_ptr, &info_ptr, &end_info);
         fclose(f);
-        std::runtime_error("empty raw data");
+        throw std::runtime_error("empty raw data");
     }
     png_bytepp row_pointers = new png_bytep[height];
     if (!row_pointers) {
         png_destroy_read_struct(&png_ptr, &info_ptr, &end_info);
         delete[] raw;
         fclose(f);
-        std::runtime_error("row_pointers problem");
+        throw std::runtime_error("row_pointers problem");
     }
     for (uint32_t i = 0; i < height; ++i) {
         row_pointers[i] = raw + i * row_bytes;
