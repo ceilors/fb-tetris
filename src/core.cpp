@@ -157,10 +157,10 @@ void Tetris::gameover() {
     update_counter = update_counter_max;
 
     // game info
+    high_score = std::max(game_score, high_score);
     game_score = 0;
     game_speed = 1;
     game_lines = 0;
-    high_score = std::max(game_score, high_score);
 
     game_over_flag = false;
 
@@ -192,6 +192,7 @@ void Tetris::move(uint8_t state, bool delay) {
             if (field.intersect(&curr)) {
                 curr.pos.x++;
             }
+            set_flag = false;
             break;
         }
         case MOVE_RIGHT: {
@@ -199,6 +200,7 @@ void Tetris::move(uint8_t state, bool delay) {
             if (field.intersect(&curr)) {
                 curr.pos.x--;
             }
+            set_flag = false;
             break;
         }
         case MOVE_SOFT_DOWN: {
@@ -229,6 +231,7 @@ void Tetris::move(uint8_t state, bool delay) {
         case ROTATE_RIGHT: {
             bool side = true ? state == ROTATE_LEFT : false;
             bool ignored_all = true;
+            set_flag = false;
             curr.rotate(side);
             if (field.intersect(&curr)) {
                 for (int8_t k = 1; k <= std::max(curr.x_max, curr.y_max); ++k) {
